@@ -1,5 +1,2 @@
-const a = "   abs  ";
-
-console.log(a.trimStart().length);
-
-console.log(a.trimEnd().length);
+var regex = new RegExp("xyz", "i");
+console.log(regex);
