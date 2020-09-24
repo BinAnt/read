@@ -1,2 +1,6 @@
-global.a = 1;
-console.log(a);
+let x = 1;
+let y = 2;
+
+[x, y] = [y, x];
+
+console.log(x, y);
