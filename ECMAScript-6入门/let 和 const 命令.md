@@ -331,3 +331,276 @@ ES6允许块级作用域的任意嵌套。
 }
 ~~~~
 
+----
+
+#### 块级作用域与函数声明
+
+函数能不能在块级作用域之中声明？这是一个相当令人混淆的问题。
+
+ES5规定，函数只能在顶层作用域和函数作用域之中声明，不能在块级作用域声明。
+
+~~~~js
+// 情况一
+if (true) {
+  function f() {}
+}
+
+//情况二
+try {
+  function f() {}
+} catch (e) {
+  //...
+}
+~~~~
+
+上面两种声明，根据ES5的规定都是非法的。
+
+
+
+但是，浏览器没有遵守这个规定，为了兼容以前的旧代码，还是支持在块级作用域之中声明函数，因此上面两种情况实际都能运行，不会报错。
+
+ES6 引入了块级作用域，明确允许在块级作用域之中声明函数。ES6规定，块级作用域之中，函数声明语句的行为类似于==let==，在块级作用域之外不可引用。
+
+~~~~js
+function f() {
+  console.log("I am outside!");
+}
+
+(function () {
+  if (false) {
+    // 重复声明一次函数f
+    function f() {
+      console.log("I am inside!");
+    }
+  }
+
+  f(); // TypeError: f is not a function
+})();
+~~~~
+
+上面代码在ES5中运行，会得到“I am inside！”，因为在==if==内声明的函数==f==会被提升到函数头部，实际运行的代码如下。
+
+~~~~js
+// ES5 环境
+function f() { console.log('I am outside!'); }
+
+(function () {
+  function f() { console.log('I am inside!'); }
+  if (false) {
+  }
+  f();
+}());
+~~~~
+
+ES6就完全不一样了，理论上会得到“I am outside！”。因为块级作用域内声明的函数类似于==let==，对作用域之外没有影响。但是，如果你真的在ES6浏览器中运行一下上面的代码，会报错的，这是为什么呢？
+
+~~~~js
+// 浏览器的 ES6 环境
+function f() { console.log('I am outside!'); }
+
+(function () {
+  if (false) {
+    // 重复声明一次函数f
+    function f() { console.log('I am inside!'); }
+  }
+
+  f();
+}());
+// Uncaught TypeError: f is not a function
+~~~~
+
+上面的代码在ES6浏览器中，都会报错。
+
+
+
+考虑到环境导致的行为差异太大,应该避免在块级作用域内声明函数。如果确实需要，也应该携程函数表达式，而不是函数声明语句。
+
+~~~~js
+// 块级作用域内部的函数声明语句，建议不要使用
+{
+  let a = 'secret';
+  function f() {
+    return a;
+  }
+}
+
+// 块级作用域内部，优先使用函数表达式
+{
+  let a = 'secret';
+  let f = function () {
+    return a;
+  };
+}
+~~~~
+
+> ES6的块级作用域必须有大括号，如果没有大括号，JavaScript引擎就认为不存在块级作用域。
+
+~~~~js
+// 第一种写法，报错
+if (true) let x = 1;
+
+// 第二种写法，不报错
+if (true) {
+  let x = 1;
+}
+~~~~
+
+上面代码中，第一种写法没有大括号，所以不存在块级作用域，而==let==只能出现在当前作用域的顶层，所以报错。第二种写法有大括号，所以块级作用域成立。
+
+
+
+函数声明也是如此，严格模式下，函数只能声明在当前作用域的顶层。
+
+~~~~js
+// 不报错
+'use strict';
+if (true) {
+  function f() {}
+}
+
+// 报错
+'use strict';
+if (true)
+  function f() {}
+~~~~
+
+
+
+## 3.const命令
+
+#### 基本用法
+
+==const==声明一个只读的常量。一旦声明，常量的值就不能改变。
+
+~~~~js
+const PI = 3.1415;
+console.log(PI); // 3.1415
+
+PI = 3; //TypeError: Assignment to constant variable.
+~~~~
+
+上面代码表明改变常量的值会报错。
+
+
+
+==const==声明的变量不得改变值，这意味着，==const==一旦声明变量，就必须立即初始化，不能留到以后赋值。
+
+~~~~js
+const foo;
+// SyntaxError: Missing initializer in const declaration
+~~~~
+
+上面代码表示，对于==const==来说，只声明不赋值，就会报错。
+
+
+
+==const==的作用域与==let==命令相同：只在声明所在的块级作用域内有效。
+
+~~~~js
+if (true) {
+  const MAX = 5;
+}
+
+MAX // Uncaught ReferenceError: MAX is not defined
+~~~~
+
+==const==命令声明的常量也是不提升，同样存在暂时性死区，只能在声明的位置后面使用。
+
+~~~~js
+if (true) {
+  console.log(MAX); // ReferenceError
+  const MAX = 5;
+}
+~~~~
+
+==const==声明的常量，也与==let==一样不可重复声明。
+
+----
+
+
+
+#### 本质
+
+* ==const==实际上保证的，并不是变量的值不得改动，而是变量指向的那个内存地址所保存的数据不得改动。
+* 对于简单类型的数据（数值、字符串、布尔值），值就保存在变量指向的那个内存地址，因此等同于常量。
+* 符合类型的数据（主要是对象和数组），变量指向的内存地址，保存的只是一耳光指向实际数据的指针，==const==只能保证这个指针是固定的，至于它指向的数据结构是不是可变的，就完全不能控制了。
+
+~~~~js
+const foo = {};
+
+// 为 foo 添加一个属性，可以成功
+foo.prop = 123;
+foo.prop // 123
+
+// 将 foo 指向另一个对象，就会报错
+foo = {}; // TypeError: "foo" is read-only
+~~~~
+
+上面代码中，常量==foo==储存的是一个地址，这个地址指向一个对象。不可变的只是这个地址，即不能把==foo==指向另一个地址，但对象本身是可变的，所以依然可以为其添加新属性。
+
+----
+
+#### ES6声明变量的六种方法
+
+ES5只有两种声明变量的方法：==var==命令和==function==命令。
+
+ES6一共六种：
+
+* var
+* function
+* let
+* const
+* import
+* class
+
+## 4.顶层对象的属性
+
+顶层对象，在浏览器环境指定的是==window==对象。在Node指的是==global==对象。ES5之中，顶层对象的属性与全局变量是等价的。
+
+~~~~js
+window.a = 1;
+a // 1
+
+a = 2;
+window.a // 2
+~~~~
+
+上面代码中，顶层对象的属性赋值与全局变量的赋值，是同一件事。
+
+
+
+## 5.globalThis对象
+
+JavaScript语言存在一个顶层对象，它提供全局环境（即全局作用域），所有代码都是在这个环境中运行。但是，顶层对象在各种实现里面是不统一的。
+
+- 浏览器里面，顶层对象是==window==，但Node和Web Worker没有==window==。
+- 浏览器和Web Worker里面，==self==也指向顶层对象，但是Node没有==self==。
+- Node里面，顶层对象是==global==，但其他环境都不支持
+
+同一段代码为了能够在各种环境，都能去到顶层对象，现在一般是使用==this==变量，但是有局限性
+
+- 全局环境中，==this==会返回顶层对象。但是，Node.js模块中==this==返回的是当前模块，ES6模块中==this==返回的是==undefined==。
+- 函数里面的==this==，如果函数不是作为对象的方法运行，而是单纯作为函数运行，==this==会指向顶层对象。但是，严格模式下，这时==this==会返回==undefined==。
+- 不管是严格模式，还是普通模式，==new Function('return this')()==,总是会返回全局对象。但是，如果浏览器用了CSP(Content Security Policy, 内容安全策略)，那么==eval==、==new Function==这些方法都可能无法使用。
+
+综合所述，很难找到一种方法，可以再所有情况下，都取到顶层对象。下面是两种勉强可以使用的方法。
+
+~~~~js
+// 方法一
+(typeof window !== 'undefined'
+   ? window
+   : (typeof process === 'object' &&
+      typeof require === 'function' &&
+      typeof global === 'object')
+     ? global
+     : this);
+
+// 方法二
+var getGlobal = function () {
+  if (typeof self !== 'undefined') { return self; }
+  if (typeof window !== 'undefined') { return window; }
+  if (typeof global !== 'undefined') { return global; }
+  throw new Error('unable to locate global object');
+};
+~~~~
+

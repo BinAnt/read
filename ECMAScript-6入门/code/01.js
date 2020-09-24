@@ -1,12 +1,2 @@
-{
-  {
-    {
-      {
-        {
-          let insane = "Hello World";
-        }
-        console.log(insane);
-      }
-    }
-  }
-}
+global.a = 1;
+console.log(a);
