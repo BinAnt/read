@@ -1,6 +1,5 @@
-let x = 1;
-let y = 2;
+const a = "   abs  ";
 
-[x, y] = [y, x];
+console.log(a.trimStart().length);
 
-console.log(x, y);
+console.log(a.trimEnd().length);
