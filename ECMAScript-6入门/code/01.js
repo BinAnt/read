@@ -1,14 +1,11 @@
-// function factorial(n) {
-//   if (n === 1) return 1;
-//   return n * factorial(n - 1);
-// }
+const list = [1,2,3,4,5]
 
-// console.log(factorial(5));
+// ES5写法
+let a = list[0], b = list.slice(1)
+console.log(a, b); // 1 [ 2, 3, 4, 5 ]
 
-// 尾调用
-function factorial(n, total) {
-  if (n === 1) return total;
-  return factorial(n - 1, n * total);
-}
+// ES6写法
+[c, ...rest] = list
+console.log(c, rest); //1 [ 2, 3, 4, 5 ]
 
-console.log(factorial(5, 1)); // 120
+console.log([...'hello']); // [ 'h', 'e', 'l', 'l', 'o' ]
