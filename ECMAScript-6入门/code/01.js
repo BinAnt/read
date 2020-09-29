@@ -1,9 +1,9 @@
-let arr = [1, 2, 3];
+const keyA = { a: 1 };
+const keyB = { b: 2 };
 
-// console.log(arr.flat(), arr);
-// console.log(arr.flat(2));
-// console.log([1, 2, , 4, 5].flat());
+const myObject = {
+  [keyA]: "valueA",
+  [keyB]: "valueB",
+};
 
-console.log(3 in arr);
-let item = arr.copyWithin(2, 0);
-console.log(item);
+console.log(myObject);
