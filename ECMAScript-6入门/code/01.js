@@ -1,9 +1,4 @@
-const keyA = { a: 1 };
-const keyB = { b: 2 };
+let a = { x: 1, y: { z: false } };
+let bool = a.y.z ?? "hELO";
 
-const myObject = {
-  [keyA]: "valueA",
-  [keyB]: "valueB",
-};
-
-console.log(myObject);
+console.log(bool);
