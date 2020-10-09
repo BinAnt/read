@@ -1,4 +1,10 @@
-let a = { x: 1, y: { z: false } };
-let bool = a.y.z ?? "hELO";
+let obj = Object.fromEntries([
+  ["foo", "bar"],
+  ["baz", 42],
+]);
+console.log(obj);
+// { foo: "bar", baz: 42 }
 
-console.log(bool);
+let o = Object.fromEntries(new URLSearchParams("foo=bar&baz=qux"));
+console.log(o);
+// { foo: "bar", baz: "qux" }
