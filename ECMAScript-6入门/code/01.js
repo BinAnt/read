@@ -1,10 +1,15 @@
-let obj = Object.fromEntries([
-  ["foo", "bar"],
-  ["baz", 42],
-]);
-console.log(obj);
-// { foo: "bar", baz: 42 }
+let proto = new Proxy({}, {
+  get(target, propertyKey, receiver) {
+    console.log('GET ' + propertyKey);
+    return target[propertyKey];
+  },
+  set(obj, prop, value) {
+    obj[prop] = value
+  }
+});
 
-let o = Object.fromEntries(new URLSearchParams("foo=bar&baz=qux"));
-console.log(o);
-// { foo: "bar", baz: "qux" }
+let obj = Object.create(proto);
+obj.foo = 2
+console.log(obj.foo)
+// obj.foo // "GET foo"
+
