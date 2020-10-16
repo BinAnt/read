@@ -1,15 +1,3 @@
-let proto = new Proxy({}, {
-  get(target, propertyKey, receiver) {
-    console.log('GET ' + propertyKey);
-    return target[propertyKey];
-  },
-  set(obj, prop, value) {
-    obj[prop] = value
-  }
-});
+var obj = {a: 2}
 
-let obj = Object.create(proto);
-obj.foo = 2
-console.log(obj.foo)
-// obj.foo // "GET foo"
-
+console.log(Reflect.has(obj, 'a'));
