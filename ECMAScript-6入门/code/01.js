@@ -1,3 +1,14 @@
-var obj = {a: 2}
+async function myFunction() {
+    await somethingThatReturnPromise()
+    .catch(function(err) {
+        console.log(err);
+    })
+}
 
-console.log(Reflect.has(obj, 'a'));
+function somethingThatReturnPromise() {
+   return new Promise((resolve, reject) => {
+       reject('error')
+   })
+}
+
+myFunction() // error
