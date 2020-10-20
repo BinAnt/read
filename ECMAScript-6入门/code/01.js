@@ -1,14 +1,12 @@
-async function myFunction() {
-    await somethingThatReturnPromise()
-    .catch(function(err) {
-        console.log(err);
-    })
+function v1() {
+    return 'v1'
+}
+function v2() {
+    return 'v2'
 }
 
-function somethingThatReturnPromise() {
-   return new Promise((resolve, reject) => {
-       reject('error')
-   })
+export {
+    v1 as streamV1,
+    v2 as streamV2,
+    v2 as streamNewV2
 }
-
-myFunction() // error
