@@ -1,15 +1,12 @@
-let proto = new Proxy({}, {
-  get(target, propertyKey, receiver) {
-    console.log('GET ' + propertyKey);
-    return target[propertyKey];
-  },
-  set(obj, prop, value) {
-    obj[prop] = value
-  }
-});
+function v1() {
+    return 'v1'
+}
+function v2() {
+    return 'v2'
+}
 
-let obj = Object.create(proto);
-obj.foo = 2
-console.log(obj.foo)
-// obj.foo // "GET foo"
-
+export {
+    v1 as streamV1,
+    v2 as streamV2,
+    v2 as streamNewV2
+}
